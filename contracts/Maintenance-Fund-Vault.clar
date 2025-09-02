@@ -11,6 +11,9 @@
 (define-data-var total-funds uint u0)
 (define-data-var next-request-id uint u1)
 (define-data-var voting-duration uint u144)
+(define-data-var total-funds-distributed uint u0)
+(define-data-var total-approved-requests uint u0)
+(define-data-var total-rejected-requests uint u0)
 
 (define-map contributors
     principal
@@ -162,11 +165,21 @@
                 (>= (get votes-for request) approval-threshold)
                 (> (get votes-for request) (get votes-against request))
             )
-            (map-set maintenance-requests request-id
-                (merge request { status: "approved" })
+            (begin
+                (map-set maintenance-requests request-id
+                    (merge request { status: "approved" })
+                )
+                (var-set total-approved-requests
+                    (+ (var-get total-approved-requests) u1)
+                )
             )
-            (map-set maintenance-requests request-id
-                (merge request { status: "rejected" })
+            (begin
+                (map-set maintenance-requests request-id
+                    (merge request { status: "rejected" })
+                )
+                (var-set total-rejected-requests
+                    (+ (var-get total-rejected-requests) u1)
+                )
             )
         )
         (ok (get status
@@ -193,6 +206,9 @@
 
         (try! (as-contract (stx-transfer? amount tx-sender requester)))
         (var-set total-funds (- (var-get total-funds) amount))
+        (var-set total-funds-distributed
+            (+ (var-get total-funds-distributed) amount)
+        )
         (map-set maintenance-requests request-id
             (merge request { status: "executed" })
         )
@@ -273,5 +289,53 @@
             (/ (* balance u100) total)
             u0
         )
+    )
+)
+
+(define-read-only (get-fund-analytics)
+    (let (
+            (current-funds (var-get total-funds))
+            (distributed-funds (var-get total-funds-distributed))
+            (approved-count (var-get total-approved-requests))
+            (rejected-count (var-get total-rejected-requests))
+            (total-requests (+ approved-count rejected-count))
+        )
+        {
+            total-funds-raised: (+ current-funds distributed-funds),
+            current-fund-balance: current-funds,
+            total-distributed: distributed-funds,
+            utilization-rate: (if (> (+ current-funds distributed-funds) u0)
+                (/ (* distributed-funds u100) (+ current-funds distributed-funds))
+                u0
+            ),
+            total-requests: total-requests,
+            approved-requests: approved-count,
+            rejected-requests: rejected-count,
+            approval-rate: (if (> total-requests u0)
+                (/ (* approved-count u100) total-requests)
+                u0
+            ),
+        }
+    )
+)
+
+(define-read-only (get-performance-metrics)
+    (let (
+            (analytics (get-fund-analytics))
+            (efficiency-score (/ (+ (get utilization-rate analytics) (get approval-rate analytics))
+                u2
+            ))
+        )
+        {
+            fund-efficiency-score: efficiency-score,
+            is-performing-well: (> efficiency-score u50),
+            funds-utilization-status: (if (> (get utilization-rate analytics) u75)
+                "high-activity"
+                (if (> (get utilization-rate analytics) u25)
+                    "moderate-activity"
+                    "low-activity"
+                )
+            ),
+        }
     )
 )
