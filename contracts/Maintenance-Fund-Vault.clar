@@ -123,12 +123,12 @@
     (let (
             (milestone (unwrap! (map-get? fund-milestones milestone-id) (err u0)))
             (contributor-balance (get-contributor-balance contributor))
-            (total-funds (var-get total-funds))
+            (current-total-funds (var-get total-funds))
             (reward-percentage (get reward-percentage milestone))
             (target-amount (get target-amount milestone))
         )
         (if (and 
-                (>= total-funds target-amount)
+                (>= current-total-funds target-amount)
                 (> contributor-balance u0)
                 (get is-active milestone)
             )
@@ -440,10 +440,10 @@
 (define-read-only (calculate-voting-power (contributor principal))
     (let (
             (balance (get-contributor-balance contributor))
-            (total (var-get total-funds))
+            (total-fund-balance (var-get total-funds))
         )
-        (if (> total u0)
-            (/ (* balance u100) total)
+        (if (> total-fund-balance u0)
+            (/ (* balance u100) total-fund-balance)
             u0
         )
     )
