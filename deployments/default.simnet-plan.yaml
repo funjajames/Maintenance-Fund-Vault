@@ -1,0 +1,40 @@
+---
+id: 0
+name: "Simulated deployment, used as a default for `clarinet console`, `clarinet test` and `clarinet check`"
+network: simnet
+genesis:
+  wallets:
+    - name: deployer
+      address: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
+      balance: "100000000"
+      sbtc-balance: "1000000000"
+  contracts:
+    - genesis
+    - lockup
+    - bns
+    - cost-voting
+    - costs
+    - pox
+    - costs-2
+    - pox-2
+    - costs-3
+    - pox-3
+    - pox-4
+    - signers
+    - signers-voting
+    - costs-4
+plan:
+  batches:
+    - id: 0
+      transactions:
+        - emulated-contract-publish:
+            contract-name: Maintenance-Campaigns
+            emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
+            path: contracts/Maintenance-Campaigns.clar
+            clarity-version: 3
+        - emulated-contract-publish:
+            contract-name: Maintenance-Fund-Vault
+            emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
+            path: contracts/Maintenance-Fund-Vault.clar
+            clarity-version: 3
+      epoch: "3.1"

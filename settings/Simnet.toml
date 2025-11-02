@@ -1,0 +1,22 @@
+[network]
+name = "simnet"
+
+[accounts.deployer]
+mnemonic = "twice kind fence tip hidden tilt action fragile skin nothing glory cousin green tomorrow spring wrist shed math olympic multiply hip blue scout claw"
+balance = 100000000
+
+[accounts.wallet_1]  
+mnemonic = "sell invite acquire kitten bamboo drastic junk trunk radar kiwi trip kitten"
+balance = 100000000
+
+[accounts.wallet_2]
+mnemonic = "hold flood brave museum frog loyal embrace twice side machine spot trial"
+balance = 100000000
+
+[accounts.wallet_3]
+mnemonic = "board list obtain sugar hour worth raven scout denial thunder horse logic"
+balance = 100000000
+
+[accounts.wallet_4]
+mnemonic = "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about"
+balance = 100000000

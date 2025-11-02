@@ -1,0 +1,28 @@
+[project]
+name = 'Maintenance-Fund-Vault'
+description = 'A decentralized smart contract for managing community maintenance funds with democratic voting mechanisms and fund milestone rewards.'
+authors = []
+telemetry = true
+cache_dir = '.\.cache'
+requirements = []
+[contracts.Maintenance-Fund-Vault]
+path = 'contracts/Maintenance-Fund-Vault.clar'
+clarity_version = 3
+epoch = 3.1
+[repl.analysis]
+passes = ['check_checker']
+
+[repl.analysis.check_checker]
+strict = false
+trusted_sender = false
+trusted_caller = false
+callee_filter = false
+
+[repl.remote_data]
+enabled = false
+api_url = 'https://api.hiro.so'
+
+[contracts.Maintenance-Campaigns]
+path = 'contracts/Maintenance-Campaigns.clar'
+clarity_version = 3
+epoch = 3.1
