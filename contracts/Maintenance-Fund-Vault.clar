@@ -112,14 +112,20 @@
     (map-get? fund-milestones milestone-id)
 )
 
-(define-read-only (get-milestone-claim (milestone-id uint) (claimer principal))
+(define-read-only (get-milestone-claim
+        (milestone-id uint)
+        (claimer principal)
+    )
     (map-get? milestone-claims {
         milestone-id: milestone-id,
         claimer: claimer,
     })
 )
 
-(define-read-only (calculate-milestone-reward (milestone-id uint) (contributor principal))
+(define-read-only (calculate-milestone-reward
+        (milestone-id uint)
+        (contributor principal)
+    )
     (let (
             (milestone (unwrap! (map-get? fund-milestones milestone-id) (err u0)))
             (contributor-balance (get-contributor-balance contributor))
@@ -127,7 +133,7 @@
             (reward-percentage (get reward-percentage milestone))
             (target-amount (get target-amount milestone))
         )
-        (if (and 
+        (if (and
                 (>= current-total-funds target-amount)
                 (> contributor-balance u0)
                 (get is-active milestone)
@@ -307,9 +313,9 @@
 )
 
 ;; NEW: Fund Milestone System Functions
-(define-public (create-milestone 
-        (target-amount uint) 
-        (reward-percentage uint) 
+(define-public (create-milestone
+        (target-amount uint)
+        (reward-percentage uint)
         (description (string-ascii 200))
     )
     (let (
@@ -318,9 +324,10 @@
         )
         (asserts! (is-eq tx-sender CONTRACT_OWNER) ERR_UNAUTHORIZED)
         (asserts! (> target-amount u0) ERR_INVALID_AMOUNT)
-        (asserts! (<= reward-percentage u10) ERR_INVALID_AMOUNT)  ;; Max 10% reward
+        (asserts! (<= reward-percentage u10) ERR_INVALID_AMOUNT)
+        ;; Max 10% reward
         (asserts! (> (len description) u0) ERR_INVALID_AMOUNT)
-        
+
         (map-set fund-milestones milestone-id {
             target-amount: target-amount,
             reward-percentage: reward-percentage,
@@ -341,14 +348,16 @@
             (current-funds (var-get total-funds))
             (target-amount (get target-amount milestone))
             (reward-percentage (get reward-percentage milestone))
-            (reward-amount (unwrap! (calculate-milestone-reward milestone-id tx-sender) ERR_INVALID_AMOUNT))
+            (reward-amount (unwrap! (calculate-milestone-reward milestone-id tx-sender)
+                ERR_INVALID_AMOUNT
+            ))
             (current-block stacks-block-height)
         )
         (asserts! (get is-active milestone) ERR_INVALID_STATUS)
         (asserts! (>= current-funds target-amount) ERR_MILESTONE_NOT_REACHED)
         (asserts! (> contributor-balance u0) ERR_UNAUTHORIZED)
         (asserts! (> reward-amount u0) ERR_INVALID_AMOUNT)
-        (asserts! 
+        (asserts!
             (is-none (map-get? milestone-claims {
                 milestone-id: milestone-id,
                 claimer: tx-sender,
@@ -372,18 +381,16 @@
 
         ;; Transfer reward (from contract balance as bonus)
         (try! (as-contract (stx-transfer? reward-amount tx-sender tx-sender)))
-        
+
         (ok reward-amount)
     )
 )
 
 (define-public (deactivate-milestone (milestone-id uint))
-    (let (
-            (milestone (unwrap! (map-get? fund-milestones milestone-id) ERR_NOT_FOUND))
-        )
+    (let ((milestone (unwrap! (map-get? fund-milestones milestone-id) ERR_NOT_FOUND)))
         (asserts! (is-eq tx-sender CONTRACT_OWNER) ERR_UNAUTHORIZED)
         (asserts! (get is-active milestone) ERR_INVALID_STATUS)
-        
+
         (map-set fund-milestones milestone-id
             (merge milestone { is-active: false })
         )

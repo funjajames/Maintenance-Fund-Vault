@@ -21,3 +21,8 @@ callee_filter = false
 [repl.remote_data]
 enabled = false
 api_url = 'https://api.hiro.so'
+
+[contracts.Maintenance-Campaigns]
+path = 'contracts/Maintenance-Campaigns.clar'
+clarity_version = 3
+epoch = 3.1
